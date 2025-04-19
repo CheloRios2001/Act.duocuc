@@ -30,6 +30,7 @@ public class TeatroMoro {
         {"C1","C2","C3","C4","C5"}
      };
      static ArrayList<Entrada> entradasVendidas = new ArrayList<>();
+     static ArrayList<Entrada> entradasReservadas = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -73,6 +74,91 @@ public class TeatroMoro {
 
     }
 
+    public static int pedirCantidadEntradas(Scanner input){
+        int cantidad = -1;
+
+        do{
+            System.out.println("\nIngrese la cantidad de entradas que desea reservar:");
+
+            while (!input.hasNextInt()) {
+                System.out.println("Cantidad invalida. Debe ingresar un numero entero positivo.");
+                input.next();
+            }
+            cantidad = input.nextInt();
+
+            if (cantidad <= 0) {
+                System.out.println("Debe ingresar una cantidad mayor a 0.");
+            }
+        } while (cantidad <= 0); 
+
+        return cantidad;
+    }
+
+    public static int pedirTipoEntrada(Scanner input){
+        System.out.println("\nSeleccione el tipo de entrada:");
+        System.out.println("1. VIP");
+        System.out.println("2. Platea Alta");
+        System.out.println("3. Platea Baja");
+        System.out.println("4. Palco");
+
+        int tipoElegido = -1;
+
+        do{
+            while (!input.hasNextInt()) {
+                System.out.println("Opcion no valida. Ingrese un numero del 1 al 4.");
+                input.next();
+            }
+            tipoElegido = input.nextInt();
+
+            if (tipoElegido < 1 || tipoElegido > 4) {
+                System.out.println("Opcion no valida. Intente nuevamente.");
+            }
+        } while (tipoElegido < 1 || tipoElegido > 4);
+
+        return tipoElegido;
+
+    }
+
+    public static String elegirAsientoReserva(Scanner input){
+        String asientoElegido = "";
+        boolean asientoValido = false;
+
+        do { 
+            System.out.println("\nIngrese el asiento deseado a reservar (Ej: A1):");
+            asientoElegido = input.next().toUpperCase();
+
+            for (int fila = 0; fila < asientos.length; fila++) {
+                for (int asi = 0; asi < asientos[fila].length; asi++) {
+                    if (asientos[fila][asi].equalsIgnoreCase(asientoElegido)) {
+                        asientoValido = true;
+                        break;
+                    }
+                }
+                if (asientoValido) {
+                    break;
+                }   
+            }
+            if (!asientoValido) {
+                System.out.println("Asiento no valido o ya reservado/comprado. Intente nuevamente.");
+            }
+        } while (!asientoValido);
+
+        return asientoElegido;
+    }
+
+    public static void marcarAsientoReservado(String asientoElegido){
+        for (int fila = 0; fila < asientos.length; fila++) {
+            for (int asi = 0; asi < asientos[fila].length; asi++) {
+                if (asientos[fila][asi].equalsIgnoreCase(asientoElegido)) {
+                    asientos[fila][asi] = "RR";
+                    return;
+                }
+            }
+        }
+    }
+
+
+
     public static void mostrarEntradas(boolean esEstudiante){
         System.out.println("\nSeleccione el tipo de entrada:");
 
@@ -107,11 +193,14 @@ public class TeatroMoro {
             int opcionesMenu = -1;
 
             System.out.println("MENU PRINCIPAL");
-            System.out.println("1. Comprar entrada");
-            System.out.println("2. Ver promociones");
-            System.out.println("3. Buscar entrada");
-            System.out.println("4. Eliminar entrada");
-            System.out.println("5. Salir");
+            System.out.println("1. Reservar entrada");
+            System.out.println("2. Comprar entrada");
+            System.out.println("3. Modificar venta");
+            System.out.println("4. Imprimir boleta");
+            System.out.println("5. Buscar entrada");
+            System.out.println("6. Eliminar entrada");
+            System.out.println("7. Ver promociones");
+            System.out.println("8. Salir");
             System.out.println("Seleccione una opcion: ");
             System.out.println("---------------------------------------------------------------------------");
 
@@ -124,24 +213,32 @@ public class TeatroMoro {
 
             switch (opcionesMenu) {
                 case 1:
-                    seguirComprando = venderEntrada(input);
+                    reservarEntrada(input);
                     break;
                 case 2:
+                    seguirComprando = venderEntrada(input);
+                    break;
+                case 3:
+                    modificarVenta();
+                    break;
+                case 4:
+                    imprimirBoleta();
+                    break;
+                case 5:
+                    buscarEntradas(input);
+                    break;
+                case 6:
+                    eliminarEntrada(input);
+                    break;
+                case 7:
                     System.out.println("Promociones actuales:");
                     System.out.println("Hay un 10% de descuento para estudiantes!!");
                     System.out.println("Contamos con un 15% de descuento para la Tercera edad!!");
                     System.out.println("Por la compra de dos o mas entradas contamos con descuentos especiales!!");
                     break;
-                case 3:
-                    buscarEntradas(input);
-                    break;
-                case 4:
-                    eliminarEntrada(input);
-                    break;
-                case 5:
+                case 8:
                     seguirComprando = false;
                     break;
-            
                 default:
                     System.out.println("Opcion no valida. Intente nuevamente.");
             }
@@ -478,6 +575,37 @@ public class TeatroMoro {
         } else {
             System.out.println("Operacion cancelada. ");
         }
+    }
+
+    public static void reservarEntrada(Scanner input){
+        System.out.println("\nRESERVA DE ENTRADAS");
+        asientosTeatro();
+
+        System.out.println("Cuantas entradas desea reservar?");
+        int cantidad = pedirCantidadEntradas(input);
+
+        for (int i = 0; i < cantidad; i++) {
+            String asiento = elegirAsientoReserva(input);
+
+            Entrada nuevaReserva = new Entrada("Reservado", "Sin tarifa", asiento, 0, 0, 0.0);
+            entradasReservadas.add(nuevaReserva);
+
+            marcarAsientoReservado(asiento);
+
+            System.out.println("Asiento "+ asiento + " Registrado exitosamente.\n");
+
+            asientosTeatro();
+        }
+
+        System.out.println("Gracias por su reserva!");
+    }
+
+    public static void modificarVenta(){
+        System.out.println("Funcion de venta");
+    }
+
+    public static void imprimirBoleta(){
+        System.out.println("Imprimir boleta");
     }
 }
 
