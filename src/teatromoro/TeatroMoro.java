@@ -159,16 +159,13 @@ public class TeatroMoro {
 
 
 
-    public static void mostrarEntradas(boolean esEstudiante){
+    public static void mostrarEntradas(double descuento){
         System.out.println("\nSeleccione el tipo de entrada:");
 
         for (int i = 0; i < entradas.length; i++) {
-            int precio = precioGeneral[i];
-
-            if (esEstudiante) {
-                precio = (int) Math.round(precio * (1 - descuentoEstudiante[i]));
-            }
-            System.out.println((i+1)+ ". "+ entradas[i]+ " - $" + precio);
+            int precioBase = precioGeneral[i];
+            int precioConDescuento = (int) Math.round(precioBase * (1 - descuento));
+            System.out.println((i+1)+ ". "+ entradas[i]+ " - $" + precioConDescuento);
         }
     }
 
@@ -303,7 +300,7 @@ public class TeatroMoro {
                 tipoTarifa = "General";
             }
 
-            mostrarEntradas(esEstudiante);
+            mostrarEntradas(descuento);
 
             int tipoEntrada = -1;
 
