@@ -44,6 +44,10 @@ public class Entrada {
     public String getTipoTarifa(){
         return tipoTarifa;
     }
+
+    public String getAsiento(){
+        return asiento;
+    }
     
 }
 
