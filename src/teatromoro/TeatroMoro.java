@@ -234,7 +234,7 @@ public class TeatroMoro {
                     comprarReserva(input);
                     break;
                 case 4:
-                    modificarVenta();
+                    modificarVenta(input);
                     break;   
                 case 5:
                     imprimirBoleta();
@@ -286,6 +286,19 @@ public class TeatroMoro {
             default:
                 return "";
         }
+    }
+
+    public static void liberarAsientoAnterior(String asientoAnterior){
+        for (int fila = 0; fila < asientos.length; fila++) {
+            for (int asi = 0; asi < asientos.length; asi++) {
+                if (asientos[fila][asi].equalsIgnoreCase("XX")) {
+                    if (asientoAnterior.equalsIgnoreCase(asientos[fila][asi])) {
+                        asientos[fila][asi] = asientoAnterior.toUpperCase();
+                        return;
+                    }
+                }
+            }
+        }    
     }
 
     public static String elegirAsiento(Scanner input){
@@ -707,8 +720,71 @@ public class TeatroMoro {
 
     }
 
-    public static void modificarVenta(){
-        System.out.println("Funcion de venta");
+    public static void modificarVenta(Scanner input){
+        if (entradasVendidas.isEmpty()) {
+            System.out.println("\nNo hay entradas.");
+            return;
+        }
+
+        mostrarEntradasVendidas();
+
+        System.out.println("\nIngrese el numero de la entrada que desea modificar:");
+        int numeroBuscado = -1;
+
+        while (!input.hasNextInt()) {
+            System.out.println("Numero invalido. Intente nuevamente");
+            input.next();
+        }
+        numeroBuscado = input.nextInt();
+
+        Entrada entradaAModificar = null;
+        for (Entrada entrada : entradasVendidas){
+            if (entrada.getNumero() == numeroBuscado) {
+                entradaAModificar = entrada;
+                break;
+            }
+        }
+
+        if (entradaAModificar == null) {
+            System.out.println("No hay entradas asociadas al numero ingresado.");
+            return;
+        }
+
+        boolean seguirModificando = true;
+        while (seguirModificando) {
+            System.out.println("\nQue desea modificar?");
+            System.out.println("1. Cambiar tipo de entrada");
+            System.out.println("2. Cambiar asiento");
+            System.out.println("3. Volver al menu principal");
+
+            int opcion = -1;
+            do {
+                while (!input.hasNextInt()) {
+                    System.out.println("Opcion invalida. Ingrese 1,2 o 3.");
+                    input.next();
+                }
+                opcion = input.nextInt();
+
+                if (opcion < 1 || opcion > 3) {
+                    System.out.println("Opcion no valida. Intente nuevamente.");
+                }
+            } while (opcion < 1 || opcion > 3);
+
+            switch (opcion) {
+                case 1:
+                    cambiarTipoEntrada(entradaAModificar, input);
+                    break;
+                case 2:
+                    cambiarAsiento(entradaAModificar, input);
+                    break;
+                case 3:
+                    seguirModificando = false;
+                    break;
+            
+                default:
+                    break;
+            }
+        }
     }
 
     public static void imprimirBoleta(){
@@ -735,6 +811,74 @@ public class TeatroMoro {
         System.out.println("Total a pagar: $" + total);
         System.out.println("\n---------------------------------------------------------------------------"); 
         System.out.println("Gracias por su compra. Disfrute el espectaculo!");
+    }
+
+    public static void cambiarTipoEntrada(Entrada entrada, Scanner input){
+        System.out.println("\nSeleccione el nuevo tipo de entrada:");
+
+        for (int i = 0; i < entradas.length; i++) {
+            System.out.println((1 + 1) + ". " + entradas[i] + " - $" + precioGeneral[i]);
+        }
+
+        int nuevaOpcion = -1;
+
+        do { 
+            System.out.println("\nIngrese el numero de la nueva entrada:");
+            while (!input.hasNextInt()) {
+                System.out.println("Opcion no valida. Ingrese un numero válido.");
+                input.next();
+            }
+            nuevaOpcion = input.nextInt();
+
+            if (nuevaOpcion < 1 || nuevaOpcion > entradas.length) {
+                System.out.println("Numero fuera de rango. Intente nuevamente.");
+            }
+        } while (nuevaOpcion < 1 || nuevaOpcion > entradas.length);
+
+        int nuevoIndice = nuevaOpcion -1;
+        String nuevoTipo = entradas[nuevoIndice];
+        int nuevoPrecioBase = precioGeneral[nuevoIndice];
+        double descuento = entrada.getDescuento();
+        int nuevoPrecioFinal = (int) Math.round(nuevoPrecioBase * (1 - descuento));
+
+        entrada.setTipoEntrada(nuevoTipo);
+        entrada.setPrecioBase(nuevoPrecioBase);
+        entrada.setPrecioFinal(nuevoPrecioFinal);
+
+        System.out.println("\nTipo de entrada modificada correctamente.");
+    }
+
+    public static void cambiarAsiento(Entrada entrada, Scanner input){
+        asientosTeatro();
+
+        String nuevoAsiento = "";
+        boolean asientoValido = false;
+
+        do { 
+            System.out.println("\nIngrese el nuevo asiento (Ej: A1)");
+            nuevoAsiento = input.next().toUpperCase();
+
+            for (int fila = 0; fila < asientos.length; fila++) {
+                for (int asi = 0; asi < asientos[fila].length; asi++) {
+                    if (asientos[fila][asi].equalsIgnoreCase(nuevoAsiento)) {
+                        asientos[fila][asi] = "XX";
+                        asientoValido = true;
+                        break;
+                    }
+                }
+                if (asientoValido) {
+                    break;
+                }
+                if (!asientoValido) {
+                    System.out.println("Asiento no valido o ocupado. Intente nuevamente.");
+                }
+            }
+        } while (!asientoValido);
+
+        liberarAsientoAnterior(entrada.getAsiento());
+        entrada.setAsiento(nuevoAsiento);
+
+        System.out.println("\nAsiento cambiado exitosamente.");
     }
 }
 

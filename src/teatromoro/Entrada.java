@@ -33,6 +33,7 @@ public class Entrada {
         System.out.println("---------------------------------------------------------------------------");
     }
 
+        //GET
     public int getNumero(){
         return numero;
     }
@@ -52,6 +53,26 @@ public class Entrada {
     public int getPrecioFinal(){
         return precioFinal;
     }
+    public double getDescuento(){
+        return descuento;
+    }
     
+
+    //SET
+    public void setTipoEntrada(String tipoEntrada){
+        this.tipoEntrada = tipoEntrada;
+    }
+
+    public void setPrecioBase(int precioBase){
+        this.precioBase = precioBase;
+    }
+
+    public void setPrecioFinal(int precioFinal){
+        this.precioFinal = precioFinal;
+    }
+
+    public void setAsiento(String asiento){
+        this.asiento = asiento;
+    }
 }
 
