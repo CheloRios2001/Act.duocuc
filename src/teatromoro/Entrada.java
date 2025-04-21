@@ -48,6 +48,10 @@ public class Entrada {
     public String getAsiento(){
         return asiento;
     }
+
+    public int getPrecioFinal(){
+        return precioFinal;
+    }
     
 }
 

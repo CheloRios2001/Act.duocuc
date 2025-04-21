@@ -712,7 +712,29 @@ public class TeatroMoro {
     }
 
     public static void imprimirBoleta(){
-        System.out.println("Imprimir boleta");
+        if (entradasVendidas.isEmpty()) {
+            System.out.println("\nNo hay entradas vendidas.");
+            return;
+        }
+
+        System.out.println("\n---------------------------------------------------------------------------");
+        System.out.println("                      BOLETA DE COMPRA");
+        System.out.println("\n---------------------------------------------------------------------------");
+
+        int contador = 1;
+        int total = 0;
+
+        for (Entrada entrada : entradasVendidas){
+            System.out.println("Entrada N°" + contador + " - Tipo: " + entrada.getTipoEntrada() + " - Asiento: " + entrada.getAsiento() + " - Precio: $" + entrada.getPrecioFinal());
+            total += entrada.getPrecioFinal();
+            contador++;
+        }
+
+        System.out.println("\n---------------------------------------------------------------------------");
+        System.out.println("Cantidad de entradas: " + entradasVendidas.size());
+        System.out.println("Total a pagar: $" + total);
+        System.out.println("\n---------------------------------------------------------------------------"); 
+        System.out.println("Gracias por su compra. Disfrute el espectaculo!");
     }
 }
 
