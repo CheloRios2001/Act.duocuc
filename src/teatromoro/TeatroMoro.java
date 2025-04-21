@@ -131,6 +131,7 @@ public class TeatroMoro {
                 for (int asi = 0; asi < asientos[fila].length; asi++) {
                     if (asientos[fila][asi].equalsIgnoreCase(asientoElegido)) {
                         asientoValido = true;
+                        System.out.println("[DEBUG] Asiento seleccionado para reserva: " + asientoElegido);
                         break;
                     }
                 }
@@ -151,6 +152,7 @@ public class TeatroMoro {
             for (int asi = 0; asi < asientos[fila].length; asi++) {
                 if (asientos[fila][asi].equalsIgnoreCase(asientoElegido)) {
                     asientos[fila][asi] = "RR";
+                    System.out.println("[DEBUG] Asiento reservado: " + asientoElegido);
                     return;
                 }
             }
@@ -160,12 +162,13 @@ public class TeatroMoro {
     public static void marcarAsientoVendido(String asientoElegido){
         for (int fila = 0; fila < asientos.length; fila++) {
             for (int asi = 0; asi < asientos[fila].length; asi++) {
-                if (asientos[fila][asi].equalsIgnoreCase("RR")){
-                    String asientoOriginal = filaLetra(fila) + (asi + 1);
-                    if (asientoOriginal.equalsIgnoreCase(asientoElegido)) {
-                        asientos[fila][asi] = "XX";
-                        return;
-                    }
+                String asientoActual = asientos[fila][asi];
+                String nombreOriginal = filaLetra(fila) + (asi + 1);
+
+                if ((asientoActual.equalsIgnoreCase("RR") || asientoActual.equalsIgnoreCase(nombreOriginal)) && nombreOriginal.equalsIgnoreCase(asientoElegido)) {
+                    asientos[fila][asi] = "XX";
+                    System.out.println("[DEBUG] Asiento marcado como vendido: " + asientoElegido);
+                    return;
                 }
             }
         }
@@ -281,7 +284,7 @@ public class TeatroMoro {
                 return "A";
             case 1:
                 return "B";
-            case 3:
+            case 2:
                 return "C";
             default:
                 return "";
@@ -290,12 +293,12 @@ public class TeatroMoro {
 
     public static void liberarAsientoAnterior(String asientoAnterior){
         for (int fila = 0; fila < asientos.length; fila++) {
-            for (int asi = 0; asi < asientos.length; asi++) {
-                if (asientos[fila][asi].equalsIgnoreCase("XX")) {
-                    if (asientoAnterior.equalsIgnoreCase(asientos[fila][asi])) {
-                        asientos[fila][asi] = asientoAnterior.toUpperCase();
-                        return;
-                    }
+            for (int asi = 0; asi < asientos[fila].length; asi++) {
+                String asientoActual = filaLetra(fila) + (asi + 1);
+                if (asientoActual.equalsIgnoreCase(asientoAnterior) && asientos[fila][asi].equals("XX")) {
+                    asientos[fila][asi] = asientoAnterior.toUpperCase();
+                    System.out.println("[DEBUG] Asiento liberado: " + asientoAnterior);
+                    return;
                 }
             }
         }    
@@ -314,6 +317,7 @@ public class TeatroMoro {
                     if (asientos[fila][asi].equals(asientoElegido)) {
                         asientos[fila][asi] = "XX";
                         asientoValido = true;
+                        System.out.println("[DEBUG] Asiento seleccionado para compra: " + asientoElegido);
                         break;
                     }
                 }
@@ -712,9 +716,11 @@ public class TeatroMoro {
 
         Entrada nueva = new Entrada(entradaElegida, tipoTarifa, asiento, precioBase, precioFinal, descuento);
         entradasVendidas.add(nueva);
+        System.out.println("[DEBUG] Reserva convertida en compra: Asiento " + asiento);
 
         marcarAsientoVendido(asiento);
         entradasReservadas.remove(reservaElegida);
+        System.out.println("[DEBUG] Reserva eliminada de lista de reservas: Asiento " + asiento);
 
         resumenFinal(tipoTarifa, entradaElegida, precioFinal, asiento, descuento, precioBase);
 
@@ -803,8 +809,12 @@ public class TeatroMoro {
         for (Entrada entrada : entradasVendidas){
             System.out.println("Entrada N°" + contador + " - Tipo: " + entrada.getTipoEntrada() + " - Asiento: " + entrada.getAsiento() + " - Precio: $" + entrada.getPrecioFinal());
             total += entrada.getPrecioFinal();
+            System.out.println("[DEBUG] Entrada impresa: " + entrada.getTipoEntrada() + " - Asiento: " + entrada.getAsiento() + " - Precio: $" + entrada.getPrecioFinal());
             contador++;
         }
+
+        System.out.println("[DEBUG] Cantidad de entradas impresas: " + (contador - 1));
+        System.out.println("[DEBUG] Total calculado: $" + total);
 
         System.out.println("\n---------------------------------------------------------------------------");
         System.out.println("Cantidad de entradas: " + entradasVendidas.size());
@@ -853,6 +863,7 @@ public class TeatroMoro {
 
         String nuevoAsiento = "";
         boolean asientoValido = false;
+        String asientoAnterior = entrada.getAsiento();
 
         do { 
             System.out.println("\nIngrese el nuevo asiento (Ej: A1)");
@@ -869,14 +880,15 @@ public class TeatroMoro {
                 if (asientoValido) {
                     break;
                 }
-                if (!asientoValido) {
-                    System.out.println("Asiento no valido o ocupado. Intente nuevamente.");
-                }
+            }
+            if (!asientoValido) {
+                System.out.println("Asiento no valido o ocupado. Intente nuevamente.");
             }
         } while (!asientoValido);
 
-        liberarAsientoAnterior(entrada.getAsiento());
+        liberarAsientoAnterior(asientoAnterior);
         entrada.setAsiento(nuevoAsiento);
+        System.out.println("[DEBUG] Cambio de asiento exitoso: de " + asientoAnterior + " a " + nuevoAsiento);
 
         System.out.println("\nAsiento cambiado exitosamente.");
     }
