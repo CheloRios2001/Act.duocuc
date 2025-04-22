@@ -94,29 +94,34 @@ public class TeatroMoro {
         return cantidad;
     }
 
-    public static int pedirTipoEntrada(Scanner input){
+    public static int pedirOpcion(Scanner input, int minimo, int maximo, String mensajeError){
+        int opcion = -1;
+        boolean entradaValida = false;
+
+        do { 
+            if (input.hasNextInt()) {
+               opcion = input.nextInt();
+               if (opcion >= minimo && opcion <= maximo) {
+                    entradaValida = true;
+               } else {
+                System.out.println(mensajeError);
+               }
+            } else {
+                System.out.println(mensajeError);
+                input.nextLine();
+            }
+        } while (!entradaValida);
+        return opcion;
+    }
+
+    public static int pedirTipoEntrada(Scanner input) {
         System.out.println("\nSeleccione el tipo de entrada:");
         System.out.println("1. VIP");
         System.out.println("2. Platea Alta");
         System.out.println("3. Platea Baja");
         System.out.println("4. Palco");
 
-        int tipoElegido = -1;
-
-        do{
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese un numero del 1 al 4.");
-                input.next();
-            }
-            tipoElegido = input.nextInt();
-
-            if (tipoElegido < 1 || tipoElegido > 4) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
-            }
-        } while (tipoElegido < 1 || tipoElegido > 4);
-
-        return tipoElegido;
-
+        return pedirOpcion(input, 1, 4, "Opcion no valida. Ingrese un numero del 1 al 4.");
     }
 
     public static String elegirAsientoReserva(Scanner input){
@@ -204,8 +209,6 @@ public class TeatroMoro {
         boolean seguirComprando = true;
         
         while (seguirComprando){
-            int opcionesMenu = -1;
-
             System.out.println("MENU PRINCIPAL");
             System.out.println("1. Reservar entrada");
             System.out.println("2. Comprar entrada");
@@ -218,13 +221,8 @@ public class TeatroMoro {
             System.out.println("9. Salir");
             System.out.println("Seleccione una opcion: ");
             System.out.println("---------------------------------------------------------------------------");
-
-            while (!input.hasNextInt()){
-                System.out.println("Opcion no valida. Debe ingresar un numero positivo entre 1 y 9.");
-                input.next();
-            }
-
-            opcionesMenu = input.nextInt();
+            
+            int opcionesMenu = pedirOpcion(input, 1, 9, "Opción no válida. Debe ser un número entre 1 y 9.");
 
             switch (opcionesMenu) {
                 case 1:
@@ -386,19 +384,7 @@ public class TeatroMoro {
             System.out.println("1. Si");
             System.out.println("2.No");
 
-            int respuesta = -1;
-
-            do {
-                while (!input.hasNextInt()) {
-                    System.out.println("Opcion no valida. Ingrese 1 para Si o 2 para No.");
-                    input.next();
-                }
-                respuesta = input.nextInt();
-
-                if (respuesta != 1 && respuesta != 2) {
-                    System.out.println("Opcion no valida. Ingrese 1 para Si o 2 para No.");
-                }
-            } while (respuesta != 1 && respuesta != 2);
+            int respuesta = pedirOpcion(input, 1, 2, "Opcion no valida. Ingrese 1 para Si o 2 para No.");
             
         return (respuesta == 1);
     }
@@ -428,19 +414,7 @@ public class TeatroMoro {
         System.out.println("Seleccione una opcion: ");
         System.out.println("---------------------------------------------------------------------------");
 
-        int opcion = -1;
-
-        do {
-            while (!input.hasNextInt()) {
-                System.out.println("Entrada no valida. Ingrese 1, 2 o 3.");
-                input.next();
-            }
-            opcion = input.nextInt();
-
-            if (opcion < 1 || opcion > 4) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
-            }
-        } while (opcion < 1 || opcion > 4);
+        int opcion = pedirOpcion(input, 1, 4, "Opcion no valida. Ingrese un numero entre 1 y 4.");
 
         switch (opcion) {
             case 1:
@@ -492,19 +466,7 @@ public class TeatroMoro {
         System.out.println("3. Platea Baja");
         System.out.println("4. Palco");
 
-        int tipoElegido = -1;
-
-        do {
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese un numero del 1 al 4.");
-                input.next();
-            }
-            tipoElegido = input.nextInt();
-
-            if (tipoElegido < 1 || tipoElegido > 4) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
-            }
-        } while (tipoElegido < 1 || tipoElegido > 4);
+        int tipoElegido = pedirOpcion(input, 1, 4, "Opcion no valida. Ingrese un numero del 1 al 4.");
 
         String tipoBuscado = entradas[tipoElegido - 1];
         boolean encontrado = false;
@@ -529,19 +491,7 @@ public class TeatroMoro {
         System.out.println("2. Tercera edad");
         System.out.println("3. General");
 
-        int opcion = -1;
-
-        do {
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese 1,2 o 3 segun corresponda.");
-                input.next();
-            }
-            opcion = input.nextInt();
-
-            if (opcion < 1 || opcion > 3) {
-                System.out.println("Opcion no valida. Intente nuevamente.");
-            }
-        } while (opcion < 1 || opcion > 3);
+        int opcion = pedirOpcion(input, 1, 3, "Opcion no valida. Ingrese 1,2 o 3 segun corresponda.");
 
         String tipoBuscado = "";
 
@@ -604,15 +554,7 @@ public class TeatroMoro {
         entradaAEliminar.mostrarInfo();
         System.out.println("Desea eliminar esta entrada? (1. Si / 2. No):");
 
-        int opcion = -1;
-
-        do {
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese 1 o 2: ");  
-                input.next();
-            }
-            opcion = input.nextInt();
-        } while(opcion != 1 && opcion != 2);
+        int opcion = pedirOpcion(input, 1, 2, "Opcion no valida. Ingrese 1 o 2: ");
 
         if (opcion == 1) {
             entradasVendidas.remove(entradaAEliminar);
@@ -692,22 +634,7 @@ public class TeatroMoro {
 
         mostrarEntradas(descuento);
 
-        int tipoEntrada = -1;
-
-        do {
-            System.out.println("\nIngrese el número de la entrada que desea:");
-
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese un numero válido.");
-                input.next();
-            }
-
-            tipoEntrada = input.nextInt();
-
-            if (tipoEntrada < 1 || tipoEntrada > 4) {
-                System.out.println("Opcion no válida. Intente nuevamente.");
-            }
-        } while (tipoEntrada < 1 || tipoEntrada > 4);
+        int tipoEntrada = pedirOpcion(input, 1, 4, "Opcion no valida. Ingrese un número entre 1 y 4.");
 
         int indice = tipoEntrada - 1;
         String entradaElegida = entradas[indice];
@@ -763,18 +690,7 @@ public class TeatroMoro {
             System.out.println("2. Cambiar asiento");
             System.out.println("3. Volver al menu principal");
 
-            int opcion = -1;
-            do {
-                while (!input.hasNextInt()) {
-                    System.out.println("Opcion invalida. Ingrese 1,2 o 3.");
-                    input.next();
-                }
-                opcion = input.nextInt();
-
-                if (opcion < 1 || opcion > 3) {
-                    System.out.println("Opcion no valida. Intente nuevamente.");
-                }
-            } while (opcion < 1 || opcion > 3);
+            int opcion = pedirOpcion(input, 1, 3, "Opcion invalida. Ingrese 1,2 o 3.");
 
             switch (opcion) {
                 case 1:
