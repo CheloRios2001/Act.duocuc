@@ -31,7 +31,9 @@ public class TeatroMoro {
      };
      static ArrayList<Entrada> entradasVendidas = new ArrayList<>();
      static ArrayList<Entrada> entradasReservadas = new ArrayList<>();
-
+     static int totalEntradasVendidas = 0;
+     static int totalIngresos = 0;
+     static final int capacidadSala = 15;
 
     public static void main(String[] args) {
 
@@ -191,19 +193,6 @@ public class TeatroMoro {
         }
     }
 
-    public static void resumenFinal(String tipoTarifa, String entradaElegida, int precioFinal, String asiento, double descuento, int precioBase) {
-        System.out.println("\n---------------------------------------------------------------------------");
-        System.out.println("Resumen de la compra:");
-        System.out.println("Tipo de tarifa: " + tipoTarifa);
-        System.out.println("Entrada elegida: " + entradaElegida);
-        System.out.println("Asiento: " + asiento);
-        System.out.println("Precio Base: $" + precioBase);
-        System.out.println("Descuento aplicado: " + (int)(descuento * 100)+ "%");
-        System.out.println("Precio a pagar: $" + precioFinal);
-        System.out.println("---------------------------------------------------------------------------");
-        System.out.println("Gracias por su compra, Disfrute su funcion.");
-    }
-
     public static void menuPrincipal(Scanner input){
 
         boolean seguirComprando = true;
@@ -218,11 +207,12 @@ public class TeatroMoro {
             System.out.println("6. Buscar entrada");
             System.out.println("7. Eliminar entrada");
             System.out.println("8. Ver promociones");
-            System.out.println("9. Salir");
+            System.out.println("9. Ingresos totales");
+            System.out.println("10. Salir");
             System.out.println("Seleccione una opcion: ");
             System.out.println("---------------------------------------------------------------------------");
             
-            int opcionesMenu = pedirOpcion(input, 1, 9, "Opción no válida. Debe ser un número entre 1 y 9.");
+            int opcionesMenu = pedirOpcion(input, 1, 10, "Opción no válida. Debe ser un número entre 1 y 10.");
 
             switch (opcionesMenu) {
                 case 1:
@@ -253,6 +243,8 @@ public class TeatroMoro {
                     System.out.println("Por la compra de dos o mas entradas contamos con descuentos especiales!!");
                     break;  
                 case 9:
+                    mostrarIngresosTotales();
+                case 10:
                     seguirComprando = false;
                     break;
                 default:
@@ -374,13 +366,16 @@ public class TeatroMoro {
             int precioBase = precioGeneral[indice];
             int precioFinal = (int)Math.round(precioBase* (1 - descuento));
 
-            resumenFinal( tipoTarifa, entradaElegida, precioFinal, asiento, descuento, precioBase);
-
             Entrada nueva = new Entrada(entradaElegida, tipoTarifa, asiento, precioBase, precioFinal, descuento );
 
             entradasVendidas.add(nueva);
+            nueva.mostrarInfo();
+            System.out.println("Gracias por comprar! que disfrute su funcion.");
 
-            System.out.println("\nDesea comprar otra entrada?");
+            totalEntradasVendidas++;
+            totalIngresos += precioFinal;
+
+            System.out.println("\nDesea volver al menu principal?");
             System.out.println("1. Si");
             System.out.println("2.No");
 
@@ -559,6 +554,8 @@ public class TeatroMoro {
         if (opcion == 1) {
             entradasVendidas.remove(entradaAEliminar);
             System.out.println("Entrada eliminada correctamente. ");
+            totalIngresos -= entradaAEliminar.getPrecioFinal();
+            totalEntradasVendidas--;
         } else {
             System.out.println("Operacion cancelada. ");
         }
@@ -643,13 +640,16 @@ public class TeatroMoro {
 
         Entrada nueva = new Entrada(entradaElegida, tipoTarifa, asiento, precioBase, precioFinal, descuento);
         entradasVendidas.add(nueva);
+        nueva.mostrarInfo();
+
+        totalEntradasVendidas++;
+        totalIngresos += precioFinal;
+
         System.out.println("[DEBUG] Reserva convertida en compra: Asiento " + asiento);
 
         marcarAsientoVendido(asiento);
         entradasReservadas.remove(reservaElegida);
         System.out.println("[DEBUG] Reserva eliminada de lista de reservas: Asiento " + asiento);
-
-        resumenFinal(tipoTarifa, entradaElegida, precioFinal, asiento, descuento, precioBase);
 
     }
 
@@ -715,28 +715,23 @@ public class TeatroMoro {
             return;
         }
 
-        System.out.println("\n---------------------------------------------------------------------------");
-        System.out.println("                      BOLETA DE COMPRA");
-        System.out.println("\n---------------------------------------------------------------------------");
+        System.out.println("\n--------------------------------   BOLETAS GENERADAS   -------------------------------------------");
 
-        int contador = 1;
+        for (Entrada entrada : entradasVendidas){
+            entrada.mostrarInfo();
+        }
+    }
+
+    public static void mostrarIngresosTotales(){
         int total = 0;
 
         for (Entrada entrada : entradasVendidas){
-            System.out.println("Entrada N°" + contador + " - Tipo: " + entrada.getTipoEntrada() + " - Asiento: " + entrada.getAsiento() + " - Precio: $" + entrada.getPrecioFinal());
             total += entrada.getPrecioFinal();
-            System.out.println("[DEBUG] Entrada impresa: " + entrada.getTipoEntrada() + " - Asiento: " + entrada.getAsiento() + " - Precio: $" + entrada.getPrecioFinal());
-            contador++;
         }
 
-        System.out.println("[DEBUG] Cantidad de entradas impresas: " + (contador - 1));
-        System.out.println("[DEBUG] Total calculado: $" + total);
-
         System.out.println("\n---------------------------------------------------------------------------");
-        System.out.println("Cantidad de entradas: " + entradasVendidas.size());
-        System.out.println("Total a pagar: $" + total);
-        System.out.println("\n---------------------------------------------------------------------------"); 
-        System.out.println("Gracias por su compra. Disfrute el espectaculo!");
+        System.out.println("Ingresos totales acumulados: $" + total);
+        System.out.println("---------------------------------------------------------------------------");
     }
 
     public static void cambiarTipoEntrada(Entrada entrada, Scanner input){

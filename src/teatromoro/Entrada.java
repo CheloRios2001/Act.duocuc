@@ -53,8 +53,13 @@ public class Entrada {
     public int getPrecioFinal(){
         return precioFinal;
     }
+
     public double getDescuento(){
         return descuento;
+    }
+    
+    public int getPrecioBase(){
+        return precioBase;
     }
     
 
