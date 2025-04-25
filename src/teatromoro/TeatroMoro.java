@@ -33,7 +33,6 @@ public class TeatroMoro {
      static ArrayList<Entrada> entradasReservadas = new ArrayList<>();
      static int totalEntradasVendidas = 0;
      static int totalIngresos = 0;
-     static final int capacidadSala = 15;
 
     public static void main(String[] args) {
 
