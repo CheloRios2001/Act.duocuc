@@ -23,7 +23,6 @@ public class TeatroMoro {
 
      static String[] entradas = {"VIP", "Platea Alta", "Platea Baja", "Palco"};
      static int[] precioGeneral = {30000, 18000, 15000, 13000};
-     static double[] descuentoEstudiante = {0.33, 0.5, 0.33, 0.5};
      static String[][] asientos = {
         {"A1","A2","A3","A4","A5"},
         {"B1","B2","B3","B4","B5"},
@@ -192,6 +191,11 @@ public class TeatroMoro {
         }
     }
 
+    public static Entrada crearEntrada(String tipoEntrada, String tipoTarifa, String asiento, int precioBase, double descuento){
+        int precioFinal = (int) Math.round(precioBase * (1 - descuento));
+        return new Entrada(tipoEntrada, tipoTarifa, asiento, precioBase, precioFinal, descuento);
+    }
+
     public static void menuPrincipal(Scanner input){
 
         boolean seguirComprando = true;
@@ -243,6 +247,7 @@ public class TeatroMoro {
                     break;  
                 case 9:
                     mostrarIngresosTotales();
+                    break;
                 case 10:
                     seguirComprando = false;
                     break;
@@ -363,16 +368,15 @@ public class TeatroMoro {
             int indice = tipoEntrada - 1;
             String entradaElegida = entradas[indice];
             int precioBase = precioGeneral[indice];
-            int precioFinal = (int)Math.round(precioBase* (1 - descuento));
 
-            Entrada nueva = new Entrada(entradaElegida, tipoTarifa, asiento, precioBase, precioFinal, descuento );
+            Entrada nueva = crearEntrada(entradaElegida, tipoTarifa, asiento, precioBase, descuento);
 
             entradasVendidas.add(nueva);
             nueva.mostrarInfo();
             System.out.println("Gracias por comprar! que disfrute su funcion.");
 
             totalEntradasVendidas++;
-            totalIngresos += precioFinal;
+            totalIngresos += nueva.getPrecioFinal();
 
             System.out.println("\nDesea volver al menu principal?");
             System.out.println("1. Si");
@@ -635,14 +639,13 @@ public class TeatroMoro {
         int indice = tipoEntrada - 1;
         String entradaElegida = entradas[indice];
         int precioBase = precioGeneral[indice];
-        int precioFinal = (int) Math.round(precioBase * (1 - descuento));
 
-        Entrada nueva = new Entrada(entradaElegida, tipoTarifa, asiento, precioBase, precioFinal, descuento);
+        Entrada nueva = crearEntrada(entradaElegida, tipoTarifa, asiento, precioBase, descuento);
         entradasVendidas.add(nueva);
         nueva.mostrarInfo();
 
         totalEntradasVendidas++;
-        totalIngresos += precioFinal;
+        totalIngresos += nueva.getPrecioFinal();
 
         System.out.println("[DEBUG] Reserva convertida en compra: Asiento " + asiento);
 
@@ -737,7 +740,7 @@ public class TeatroMoro {
         System.out.println("\nSeleccione el nuevo tipo de entrada:");
 
         for (int i = 0; i < entradas.length; i++) {
-            System.out.println((1 + 1) + ". " + entradas[i] + " - $" + precioGeneral[i]);
+            System.out.println((i + 1) + ". " + entradas[i] + " - $" + precioGeneral[i]);
         }
 
         int nuevaOpcion = -1;
