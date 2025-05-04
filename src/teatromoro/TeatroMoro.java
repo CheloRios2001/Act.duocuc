@@ -2,7 +2,9 @@
 package teatromoro;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
 
 
 
@@ -39,8 +41,17 @@ public class TeatroMoro {
 
      static ArrayList<Entrada> entradasVendidas = new ArrayList<>();
      static ArrayList<Entrada> entradasReservadas = new ArrayList<>();
+     static Cliente[] clientes = new Cliente[100];
+     static Venta[] ventas = new Venta[100];
+     static List<String> promociones = new ArrayList<>();
+     static List<Reserva> reservas = new ArrayList<>();
      static int totalEntradasVendidas = 0;
      static int totalIngresos = 0;
+
+     //CONTADORES
+
+     static int totalClientes = 0;
+     static int totalVentas = 0;
 
     public static void main(String[] args) {
 
