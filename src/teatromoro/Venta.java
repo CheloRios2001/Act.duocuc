@@ -19,4 +19,8 @@ public class Venta {
         this.descuento = descuento;
         this.precioFinal = Math.round(precioBase * (1 - descuento));
     }
+
+    public static Venta crearDesdeObjetos(int idVenta, Cliente cliente, Entrada entrada){
+        return new Venta(idVenta, cliente.getIdCliente(), entrada.getTipoEntrada(), entrada.getAsiento(), entrada.getPrecioBase(), entrada.getDescuento());
+    }
 }

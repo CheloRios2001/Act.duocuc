@@ -33,7 +33,8 @@ public class Entrada {
         System.out.println("---------------------------------------------------------------------------");
     }
 
-        //GET
+    //GET
+
     public int getNumero(){
         return numero;
     }
@@ -64,6 +65,7 @@ public class Entrada {
     
 
     //SET
+    
     public void setTipoEntrada(String tipoEntrada){
         this.tipoEntrada = tipoEntrada;
     }

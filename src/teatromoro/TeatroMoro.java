@@ -82,7 +82,7 @@ public class TeatroMoro {
         while (seguirComprando){
 
             mostrarMenu();
-            
+
             int opcionesMenu = pedirOpcion(input, 1, 10, "Opción no válida. Debe ser un número entre 1 y 10.");
 
             switch (opcionesMenu) {
@@ -229,62 +229,93 @@ public class TeatroMoro {
         }
     }
 
+    public static Cliente crearCliente(Scanner input){
+        System.out.println("\n--- Registro de cliente ---");
+        input.nextLine();
+
+        String nombre = "";
+
+        while (nombre.isEmpty()) {
+            System.out.println("Ingrese nombre del cliente:");
+            nombre = input.nextLine().trim();
+            if (nombre.isEmpty()) {
+                System.out.println("El nombre no puede estar vacío. Intente nuevamente.");
+            }
+        }
+
+        int edad;
+        do { 
+            System.out.println("Ingrese edad del cliente: ");
+            while (!input.hasNextLine()){
+                System.out.println("Dato ingresado invalido. Intente nuevamente:");
+                input.next();
+            }
+            edad = input.nextInt();
+            input.nextLine();
+            if (edad <= 0){
+                System.out.println("La edad debe ser mayor que cero.");
+            }
+        } while (edad <= 0);
+
+        System.out.println("[DEBUG] Datos capturados - Nombre: " + nombre + ", Edad: " + edad);
+
+        if (totalClientes < clientes.length){
+            int idCliente = totalClientes + 1;
+            Cliente nuevoCliente = new Cliente(idCliente, nombre, edad);
+            clientes[totalClientes++] = nuevoCliente;
+            System.out.println("[DEBUG] Cliente registrado con ID: " + idCliente + " | Total clientes ahora: " + totalClientes);
+            return nuevoCliente;
+        } else {
+            System.out.println("ERROR: No se pudo registrar mas clientes.");
+            return null;
+        }
+    }
+
     //METODOS DE OPERACIONES PRINCIPALES
 
     public static boolean venderEntrada(Scanner input) {
-        int edad = pedirEdad(input);
-        boolean esEstudiante = (edad < 18);
-        boolean terceraEdad = (edad >= 60);
-        double descuento = 0.0;
-        String tipoTarifa;
 
-            if (esEstudiante) {
+        System.out.println("\n--- Venta de entrada ---");
+
+        Cliente cliente = crearCliente(input);
+        if  (cliente == null){
+            System.out.println("No se pudo registrar al cliente. Operacion Cancelada.");
+            return true;
+        }
+        
+        double descuento = 0.0;
+        String tipoTarifa = "General";
+
+            if (cliente.esEstudiante()) {
                 descuento = DESCUENTO_ESTUDIANTE;
                 tipoTarifa = "Estudiante";
                 System.out.println("Por ser estudiante tienes un 10% de descuento en tu entrada!");
-            } else if (terceraEdad) {
+            } else if (cliente.esTerceraEdad()) {
                 descuento = DESCUENTO_TERCERA_EDAD;
                 tipoTarifa ="Tercera Edad";
                 System.out.println("Por ser adulto mayor tienes un 15% de descuento en tu entrada!");
-            } else {
-                tipoTarifa = "General";
             }
 
             mostrarEntradas(descuento);
 
-            int tipoEntrada = -1;
-
-            do {
-                System.out.println("\nIngrese el número de la entrada que desea:");
-
-                while (!input.hasNextInt()) {
-                    System.out.println("Opcion no valida. Ingrese un numero válido.");
-                    input.next();
-                }
-
-                tipoEntrada = input.nextInt();
-
-                if (tipoEntrada < 1 || tipoEntrada > 4) {
-                    System.out.println("Opcion no válida. Intente nuevamente.");
-                }
-            } while (tipoEntrada < 1 || tipoEntrada > 4);
-
-            asientosTeatro();
-
-            String asiento = elegirAsiento(input);
-
+            int tipoEntrada = pedirOpcion(input, 1, entradas.length, "Opcion no valida. Ingrese un numero valido.");
             int indice = tipoEntrada - 1;
-            String entradaElegida = entradas[indice];
+            String nombreEntrada = entradas[indice];
             int precioBase = precioGeneral[indice];
 
-            Entrada nueva = crearEntrada(entradaElegida, tipoTarifa, asiento, precioBase, descuento);
+            asientosTeatro();
+            String asiento = elegirAsiento(input);
 
-            entradasVendidas.add(nueva);
-            nueva.mostrarInfo();
-            System.out.println("Gracias por comprar! que disfrute su funcion.");
+            Entrada entrada = new Entrada(nombreEntrada, tipoTarifa, asiento, precioBase, (int)Math.round(precioBase * (1 - descuento)), descuento);
 
+            entradasVendidas.add(entrada);
             totalEntradasVendidas++;
-            totalIngresos += nueva.getPrecioFinal();
+            totalIngresos += entrada.getPrecioFinal();
+
+            Venta venta = Venta.crearDesdeObjetos(totalVentas + 1, cliente, entrada);
+
+            entrada.mostrarInfo();
+            System.out.println("Gracias por su compra. Disfrute su funcion!");
 
             System.out.println("\nDesea volver al menu principal?");
             System.out.println("1. Si");
