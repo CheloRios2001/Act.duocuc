@@ -11,4 +11,18 @@ public class Reserva {
         this.idCliente = idCliente;
         this.asiento = asiento;
     }
+
+    //GET
+    
+    public int getIdReserva() {
+        return idReserva;
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public String getAsiento() {
+        return asiento;
+    }
 }

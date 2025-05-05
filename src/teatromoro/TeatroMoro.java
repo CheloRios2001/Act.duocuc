@@ -327,94 +327,97 @@ public class TeatroMoro {
     }
 
     public static void reservarEntrada(Scanner input){
-        System.out.println("\nRESERVA DE ENTRADAS");
-        asientosTeatro();
+        System.out.println("\n--- Reserva de entradas ---");
 
-        System.out.println("Cuantas entradas desea reservar?");
+        Cliente cliente = crearCliente(input);
+        if (cliente == null) {
+            System.out.println("No se pudo registrar al cliente. Operacion Cancelada.");
+            return;
+        }
+
+        asientosTeatro();
         int cantidad = pedirCantidadEntradas(input);
 
         for (int i = 0; i < cantidad; i++) {
             String asiento = elegirAsientoReserva(input);
 
-            Entrada nuevaReserva = new Entrada("Reservado", "Sin tarifa", asiento, 0, 0, 0.0);
-            entradasReservadas.add(nuevaReserva);
+            int idReserva = reservas.size() + 1;
+            Reserva nuevaReserva = new Reserva(idReserva, cliente.getIdCliente(), asiento);
+            reservas.add(nuevaReserva);
 
             marcarAsientoReservado(asiento);
 
-            System.out.println("Asiento "+ asiento + " Registrado exitosamente.\n");
-
-            asientosTeatro();
+            System.out.println("Reserva registrada para el asiento: " + asiento + " [ID de reserva: " + idReserva + "]");
         }
 
-        System.out.println("Gracias por su reserva!");
+        System.out.println("\nResumen de la reserva para " + cliente.getNombre() + ":");
+        for(Reserva r : reservas){
+            if (r.getIdCliente() == cliente.getIdCliente()) {
+                System.out.println(" - Asiento: " + r.getAsiento() + " (ID de la reserva: " + r.getIdReserva() + ")");
+            }
+        }
+        System.out.println("Gracias por su reserva. No olvide comprar su entrada antes de la funcion!");
     }
 
     public static void comprarReserva(Scanner input){
-        if (entradasReservadas.isEmpty()) {
+        if (reservas.isEmpty()) {
             System.out.println("\nNo hay reservas.");
             return;
         }
 
         System.out.println("\nReservas disponibles:");
-        for (int i = 0; i < entradasReservadas.size(); i++) {
-            System.out.println((i + 1) + ". Asiento " + entradasReservadas.get(i).getAsiento());
+        for (int i = 0; i < reservas.size(); i++) {
+            Reserva r = reservas.get(i);
+            System.out.println((i + 1) + ". ID de la reserva: " + r.getIdReserva() + " - Asiento: " + r.getAsiento() + " - ID del cliente: " + r.getIdCliente());
         }
 
-        int numeroReserva = -1;
-        do { 
-            System.out.println("\nIngrese el numero de la reserva que desea comprar:");
-            while (!input.hasNextInt()) {
-                System.out.println("Opcion no valida. Ingrese un numero.");
-                input.next();
-            }
-            numeroReserva = input.nextInt();
+        int Seleccion = pedirOpcion(input, 1, reservas.size(), "Opcion no valida. Intente nuevamente.");
+        Reserva reservaElegida = reservas.get(Seleccion - 1);
 
-            if (numeroReserva < 1 || numeroReserva > entradasReservadas.size()) {
-                System.out.println("Numero ingresado no valido. Intente nuevamente.");
-            }
-        } while (numeroReserva < 1 || numeroReserva > entradasReservadas.size());
+        Cliente cliente = buscarClientePorId(reservaElegida.getIdCliente());
+        if (cliente == null) {
+            System.out.println("Cliente asociado a la reserva no ubicado.");
+            return;
+        }
 
-        Entrada reservaElegida = entradasReservadas.get(numeroReserva - 1);
-        String asiento = reservaElegida.getAsiento();
-        int edad = pedirEdad(input);
-        boolean esEstudiante = (edad < 18);
-        boolean terceraEdad = (edad >= 60);
         double descuento = 0.0;
-        String tipoTarifa;
+        String tipoTarifa = "General";
 
-        if (esEstudiante) {
+        if (cliente.esEstudiante()) {
             descuento = DESCUENTO_ESTUDIANTE;
             tipoTarifa = "Estudiante";
             System.out.println("Por ser estudiante tienes un 10% de descuento en tu entrada!");
-        } else if (terceraEdad) {
+        } else if (cliente.esTerceraEdad()) {
             descuento = DESCUENTO_TERCERA_EDAD;
             tipoTarifa ="Tercera Edad";
             System.out.println("Por ser adulto mayor tienes un 15% de descuento en tu entrada!");
-        } else {
-            tipoTarifa = "General";
         }
 
         mostrarEntradas(descuento);
 
-        int tipoEntrada = pedirOpcion(input, 1, 4, "Opcion no valida. Ingrese un número entre 1 y 4.");
-
+        int tipoEntrada = pedirOpcion(input, 1, entradas.length, "Opcion no valida. Intente nuevamente.");
         int indice = tipoEntrada - 1;
+
         String entradaElegida = entradas[indice];
         int precioBase = precioGeneral[indice];
 
-        Entrada nueva = crearEntrada(entradaElegida, tipoTarifa, asiento, precioBase, descuento);
+        Entrada nueva = crearEntrada(entradaElegida, tipoTarifa, reservaElegida.getAsiento(), precioBase, descuento);
         entradasVendidas.add(nueva);
-        nueva.mostrarInfo();
-
         totalEntradasVendidas++;
         totalIngresos += nueva.getPrecioFinal();
+        
+        marcarAsientoVendido(reservaElegida.getAsiento());
 
-        System.out.println("[DEBUG] Reserva convertida en compra: Asiento " + asiento);
+        Venta nuevaVenta = Venta.crearDesdeObjetos(totalVentas + 1, cliente, nueva);
+        ventas[totalVentas++] = nuevaVenta;
 
-        marcarAsientoVendido(asiento);
-        entradasReservadas.remove(reservaElegida);
-        System.out.println("[DEBUG] Reserva eliminada de lista de reservas: Asiento " + asiento);
+        reservas.remove(reservaElegida);
 
+        System.out.println("[DEBUG] Reserva convertida en compra y eliminada correctamente");
+
+        nueva.mostrarInfo();
+
+        System.out.println("Gracias por su compra. Disfrute su funcion!");
     }
 
     public static void modificarVenta(Scanner input){
@@ -662,6 +665,15 @@ public class TeatroMoro {
     public static Entrada crearEntrada(String tipoEntrada, String tipoTarifa, String asiento, int precioBase, double descuento){
         int precioFinal = (int) Math.round(precioBase * (1 - descuento));
         return new Entrada(tipoEntrada, tipoTarifa, asiento, precioBase, precioFinal, descuento);
+    }
+
+    public static Cliente buscarClientePorId(int idCliente){
+        for (int i = 0; i < totalClientes; i++) {
+            if (clientes[i] != null && clientes[i].getIdCliente() == idCliente) {
+                return clientes[i];
+            }
+        }
+        return null;
     }
 
     //METODOS DE BUSQUEDA 
