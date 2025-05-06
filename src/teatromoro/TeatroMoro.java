@@ -117,6 +117,9 @@ public class TeatroMoro {
                     mostrarIngresosTotales();
                     break;
                 case 10:
+                    gestionarClientes(input);
+                    break;
+                case 11:
                     seguirComprando = false;
                     break;
                 default:
@@ -141,7 +144,8 @@ public class TeatroMoro {
         System.out.println("7. Eliminar entrada");
         System.out.println("8. Ver promociones");
         System.out.println("9. Ingresos totales");
-        System.out.println("10. Salir");
+        System.out.println("10. Gestionar clientes");
+        System.out.println("11. Salir");
         System.out.println("Seleccione una opcion: ");
         System.out.println("---------------------------------------------------------------------------");
     }
@@ -544,6 +548,31 @@ public class TeatroMoro {
         System.out.println("---------------------------------------------------------------------------");
     }
 
+    public static void gestionarClientes(Scanner input){
+        boolean seguir = true;
+        while (seguir) {
+            System.out.println("\n--- Gestion de Clientes ---");
+            System.out.println("1. Editar cliente");
+            System.out.println("2. Eliminar Cliente");
+            System.out.println("3. Volver al menu principal");
+            System.out.println("Seleccione una opcion: ");
+
+            int opcion = pedirOpcion(input, 1, 3, "Opcion no valida. Intentelo de nuevo.");
+
+            switch (opcion) {
+                case 1:
+                    editarCliente(input);
+                    break;
+                case 2:
+                    eliminarCliente(input);
+                    break;
+                case 3:
+                    seguir = false;
+                    break;
+            }
+        }
+    }
+
     //METODOS AUXILIARES
 
     public static void asientosTeatro(){
@@ -883,6 +912,70 @@ public class TeatroMoro {
 
         System.out.println("\nAsiento cambiado exitosamente.");
     }
+
+    public static void editarCliente(Scanner input){
+        if (totalClientes == 0) {
+            System.out.println("No hay clientes registrados actualmente.");
+            return;
+        }
+        
+        System.out.println("\nIngrese el ID del cliente a editar:");
+        int idCliente = pedirOpcion(input, 1, totalClientes, "ID invalido.");
+
+        Cliente cliente = buscarClientePorId(idCliente);
+        if (cliente == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
+        }
+        System.out.println("Cliente actual: " + cliente.getNombre() + ", Edad: " + cliente.getEdad());
+
+        input.nextLine();
+        System.out.println("Ingrese nuevo nombre:");
+        String nuevoNombre = input.nextLine().trim();
+
+        System.out.println("Ingrese nueva edad:");
+        int nuevaEdad = pedirOpcion(input, 1, 150, "Edad invalida. Intente nuevamente.");
+
+        cliente.setNombre(nuevoNombre);
+        cliente.setEdad(nuevaEdad);
+
+        System.out.println("Datos actualizados.");
+    }
+
+    public static void eliminarCliente(Scanner input) {
+        if (totalClientes == 0) {
+            System.out.println("No hay clientes registrados actualmente.");
+            return;
+        }
+        
+        System.out.println("\nIngrese el ID del cliente a eliminar:");
+        int idCliente = pedirOpcion(input, 1, totalClientes, "ID inválido.");
+    
+        Cliente cliente = buscarClientePorId(idCliente);
+        if (cliente == null) {
+            System.out.println("Cliente no encontrado.");
+            return;
+        }
+    
+        for (int i = 0; i < totalVentas; i++) {
+            if (ventas[i] != null && ventas[i].getIdCliente() == idCliente) {
+                System.out.println("No se puede eliminar. El cliente tiene ventas registradas.");
+                return;
+            }
+        }
+    
+        for (int i = 0; i < totalClientes; i++) {
+            if (clientes[i].getIdCliente() == idCliente) {
+                for (int j = i; j < totalClientes - 1; j++) {
+                    clientes[j] = clientes[j + 1];
+                }
+                clientes[--totalClientes] = null;
+                System.out.println("Cliente eliminado correctamente.");
+                return;
+            }
+        }
+    }
+    
 }
 
 

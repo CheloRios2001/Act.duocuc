@@ -6,11 +6,11 @@ public class Venta {
     private int idCliente;
     private String tipoEntrada;
     private String asiento;
-    private double precioBase;
+    private int precioBase;
     private double descuento;
     private double precioFinal;
 
-    public Venta(int idVenta, int idCliente, String tipoEntrada, String asiento, double precioBase, double descuento) {
+    public Venta(int idVenta, int idCliente, String tipoEntrada, String asiento, int precioBase, double descuento) {
         this.idVenta = idVenta;
         this.idCliente = idCliente;
         this.tipoEntrada = tipoEntrada;
@@ -22,5 +22,33 @@ public class Venta {
 
     public static Venta crearDesdeObjetos(int idVenta, Cliente cliente, Entrada entrada){
         return new Venta(idVenta, cliente.getIdCliente(), entrada.getTipoEntrada(), entrada.getAsiento(), entrada.getPrecioBase(), entrada.getDescuento());
+    }
+
+    public int getIdCliente() {
+        return idCliente;
+    }
+
+    public String getTipoEntrada() {
+        return tipoEntrada;
+    }
+
+    public String getAsiento() {
+        return asiento;
+    }
+
+    public int getPrecioBase() {
+        return precioBase;
+    }
+
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public double getPrecioFinal() {
+        return precioFinal;
+    }
+
+    public int getIdVenta() {
+        return idVenta;
     }
 }
