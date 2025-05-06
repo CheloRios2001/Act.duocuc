@@ -317,6 +317,7 @@ public class TeatroMoro {
             totalIngresos += entrada.getPrecioFinal();
 
             Venta venta = Venta.crearDesdeObjetos(totalVentas + 1, cliente, entrada);
+            ventas[totalVentas++] = venta;
 
             entrada.mostrarInfo();
             System.out.println("Gracias por su compra. Disfrute su funcion!");
@@ -932,6 +933,11 @@ public class TeatroMoro {
         input.nextLine();
         System.out.println("Ingrese nuevo nombre:");
         String nuevoNombre = input.nextLine().trim();
+
+        while (nuevoNombre.isEmpty()) {
+            System.out.println("El nombre no puede estar vacio. Intente nuevamente");
+            nuevoNombre = input.nextLine().trim();
+        }
 
         System.out.println("Ingrese nueva edad:");
         int nuevaEdad = pedirOpcion(input, 1, 150, "Edad invalida. Intente nuevamente.");
