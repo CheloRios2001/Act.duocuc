@@ -250,8 +250,8 @@ public class TeatroMoro {
         int edad;
         do { 
             System.out.println("Ingrese edad del cliente: ");
-            while (!input.hasNextLine()){
-                System.out.println("Dato ingresado invalido. Intente nuevamente:");
+            while (!input.hasNextInt()){
+                System.out.println("Edad no valida. Debe ingresar un numero entero.");
                 input.next();
             }
             edad = input.nextInt();
@@ -261,11 +261,20 @@ public class TeatroMoro {
             }
         } while (edad <= 0);
 
+        String genero = "";
+        do {
+            System.out.println("Ingrese el genero del cliente (M/F):");
+            genero = input.nextLine().trim().toUpperCase();
+            if (!genero.equals("M") && !genero.equals("F")) {
+                System.out.println("Genero invalido. Solo se permite M o F.");
+            }
+        } while (!genero.equals("M") && !genero.equals("F"));
+
         System.out.println("[DEBUG] Datos capturados - Nombre: " + nombre + ", Edad: " + edad);
 
         if (totalClientes < clientes.length){
             int idCliente = totalClientes + 1;
-            Cliente nuevoCliente = new Cliente(idCliente, nombre, edad);
+            Cliente nuevoCliente = new Cliente(idCliente, nombre, edad, genero);
             clientes[totalClientes++] = nuevoCliente;
             System.out.println("[DEBUG] Cliente registrado con ID: " + idCliente + " | Total clientes ahora: " + totalClientes);
             return nuevoCliente;
@@ -286,47 +295,42 @@ public class TeatroMoro {
             System.out.println("No se pudo registrar al cliente. Operacion Cancelada.");
             return true;
         }
-        
-        double descuento = 0.0;
-        String tipoTarifa = "General";
 
-            if (cliente.esEstudiante()) {
-                descuento = DESCUENTO_ESTUDIANTE;
-                tipoTarifa = "Estudiante";
-                System.out.println("Por ser estudiante tienes un 10% de descuento en tu entrada!");
-            } else if (cliente.esTerceraEdad()) {
-                descuento = DESCUENTO_TERCERA_EDAD;
-                tipoTarifa ="Tercera Edad";
-                System.out.println("Por ser adulto mayor tienes un 15% de descuento en tu entrada!");
-            }
+        String[] datosDescuento = calcularDescuento(cliente);
+        String tipoTarifa = datosDescuento[0];
+        double descuento = Double.parseDouble(datosDescuento[1]);
 
-            mostrarEntradas(descuento);
+        if (!tipoTarifa.equals("General")) {
+            System.out.println("Por ser " + tipoTarifa.toLowerCase() + " tienes un " + (int)(descuento * 100) + "% de descuento en tu entrada!");
+        }
 
-            int tipoEntrada = pedirOpcion(input, 1, entradas.length, "Opcion no valida. Ingrese un numero valido.");
-            int indice = tipoEntrada - 1;
-            String nombreEntrada = entradas[indice];
-            int precioBase = precioGeneral[indice];
+        mostrarEntradas(descuento);
 
-            asientosTeatro();
-            String asiento = elegirAsiento(input);
+        int tipoEntrada = pedirOpcion(input, 1, entradas.length, "Opcion no valida. Ingrese un numero valido.");
+        int indice = tipoEntrada - 1;
+        String nombreEntrada = entradas[indice];
+        int precioBase = precioGeneral[indice];
 
-            Entrada entrada = new Entrada(nombreEntrada, tipoTarifa, asiento, precioBase, (int)Math.round(precioBase * (1 - descuento)), descuento);
+        asientosTeatro();
+        String asiento = elegirAsiento(input);
 
-            entradasVendidas.add(entrada);
-            totalEntradasVendidas++;
-            totalIngresos += entrada.getPrecioFinal();
+        Entrada entrada = new Entrada(nombreEntrada, tipoTarifa, asiento, precioBase, (int)Math.round(precioBase * (1 - descuento)), descuento);
 
-            Venta venta = Venta.crearDesdeObjetos(totalVentas + 1, cliente, entrada);
-            ventas[totalVentas++] = venta;
+        entradasVendidas.add(entrada);
+        totalEntradasVendidas++;
+        totalIngresos += entrada.getPrecioFinal();
 
-            entrada.mostrarInfo();
-            System.out.println("Gracias por su compra. Disfrute su funcion!");
+        Venta venta = Venta.crearDesdeObjetos(totalVentas + 1, cliente, entrada);
+        ventas[totalVentas++] = venta;
 
-            System.out.println("\nDesea volver al menu principal?");
-            System.out.println("1. Si");
-            System.out.println("2.No");
+        entrada.mostrarInfo();
+        System.out.println("Gracias por su compra. Disfrute su funcion!");
 
-            int respuesta = pedirOpcion(input, 1, 2, "Opcion no valida. Ingrese 1 para Si o 2 para No.");
+        System.out.println("\nDesea volver al menu principal?");
+        System.out.println("1. Si");
+        System.out.println("2.No");
+
+        int respuesta = pedirOpcion(input, 1, 2, "Opcion no valida. Ingrese 1 para Si o 2 para No.");
             
         return (respuesta == 1);
     }
@@ -385,17 +389,12 @@ public class TeatroMoro {
             return;
         }
 
-        double descuento = 0.0;
-        String tipoTarifa = "General";
+        String[] datosDescuento = calcularDescuento(cliente);
+        String tipoTarifa = datosDescuento[0];
+        double descuento = Double.parseDouble(datosDescuento[1]);
 
-        if (cliente.esEstudiante()) {
-            descuento = DESCUENTO_ESTUDIANTE;
-            tipoTarifa = "Estudiante";
-            System.out.println("Por ser estudiante tienes un 10% de descuento en tu entrada!");
-        } else if (cliente.esTerceraEdad()) {
-            descuento = DESCUENTO_TERCERA_EDAD;
-            tipoTarifa ="Tercera Edad";
-            System.out.println("Por ser adulto mayor tienes un 15% de descuento en tu entrada!");
+        if (!tipoTarifa.equals("General")) {
+            System.out.println("Por ser " + tipoTarifa.toLowerCase() + " tienes un " + (int)(descuento * 100) + "% de descuento en tu entrada!");
         }
 
         mostrarEntradas(descuento);
@@ -704,6 +703,39 @@ public class TeatroMoro {
             }
         }
         return null;
+    }
+
+    public static String[] calcularDescuento(Cliente cliente){
+        double mayorDescuento = 0.0;
+        String tipoTarifa = "General";
+
+        if (cliente.getEdad() < 13) {
+            mayorDescuento = 0.10;
+            tipoTarifa = "Niño";
+        }
+
+        if (cliente.getGenero().equalsIgnoreCase("F")) {
+            if (0.20 > mayorDescuento) {
+                mayorDescuento = 0.20;
+                tipoTarifa= "Mujer";
+            }
+        }
+
+        if (cliente.getEdad() < 18) {
+            if (0.15 > mayorDescuento) {
+                mayorDescuento = 0.15;
+                tipoTarifa = "Estudiante";
+            }
+        }
+
+        if (cliente.getEdad() >= 60) {
+            if (0.25 > mayorDescuento) {
+                mayorDescuento = 0.25;
+                tipoTarifa = "Tercera edad";
+            }
+        }
+
+        return new String[]{tipoTarifa, Double.toString(mayorDescuento)};
     }
 
     //METODOS DE BUSQUEDA 

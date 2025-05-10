@@ -4,11 +4,13 @@ public class Cliente {
     private int idCliente;
     private String nombre;
     private int edad;
+    private String genero;
 
-    public Cliente(int idCliente, String nombre, int edad) {
+    public Cliente(int idCliente, String nombre, int edad, String genero) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.edad = edad;
+        this.genero = genero;
     }
 
     public boolean esEstudiante() {
@@ -17,6 +19,14 @@ public class Cliente {
 
     public boolean esTerceraEdad() {
         return edad >= 60;
+    }
+
+    public boolean esNino(){
+       return edad < 12; 
+    }
+
+    public boolean esMujer(){
+        return genero.equalsIgnoreCase("F");
     }
 
     //GET
@@ -30,6 +40,10 @@ public class Cliente {
 
     public int getEdad() {
         return edad;
+    }
+
+    public String getGenero(){
+        return genero;
     }
 
     //SET
