@@ -20,12 +20,6 @@ public class TeatroMoro {
     /**
      * @param args the command line arguments
      */
-    //VARIABLES GLOBALES
-
-    //CONSTANTES
-
-    private static final double DESCUENTO_ESTUDIANTE = 0.10;
-    private static final double DESCUENTO_TERCERA_EDAD = 0.15;
 
     //DATOS FIJOS DEL TEATRO
 
